@@ -138,21 +138,66 @@
     }).get();
 
     var newFriend = {
-      friendName: $("#survey-name").val().trim(),
-      friendPic: $("#survey-pic").val().trim(),
-      friendRes: friendResults
+      name: $("#survey-name").val().trim(),
+      photo: $("#survey-pic").val().trim(),
+      scores: friendResults
     };
 
-    console.log(newFriend);
+    //console.log(newFriend);
+
+    $.get("/api/friends", function(d){
+
+      console.log(d); //array of friends objs
+
+      var myNums = friendResults.map(Number);
+      console.log(myNums);
+
+      var compsArr = [];
+      for(var i=0; i<d.length; i++){
+        var frNums = d[i].scores.map(Number);
+        //console.log(frNums);
+        var s = compAre(myNums, frNums);
+        compsArr.push(s);
+      };
+
+      console.log(compsArr);
+
+      var r = indexOfMin(compsArr);
+
+      alert("Your Friend is " + d[r].name + "!!!");
+
+    });
+
+    var compAre = function(arr1, arr2){
+      var sumArr = [];
+      for (var i=0; i<arr1.length; i++){
+        sumArr.push(Math.abs(arr1[i] - arr2[i]));
+      }
+      var summed = sumArr.reduce(function(a,b){return a+b;}, 0);
+      return summed;
+    };
+
+    var indexOfMin = function(arr) {
+      if (arr.length === 0){
+        return -1;
+      } 
+      var min = arr[0];
+      var minIndex = 0;
+
+      for (var i = 1; i< arr.length; i++){
+        if (arr[i] < min) {
+          minIndex = i;
+          min = arr[i];
+        }
+      }
+      return minIndex;
+    };
 
     $.post("/api/friends", newFriend,
-      function(data){
+      function(data){ 
+        console.log("Posted!");
+    });
 
-        if (data){
-          alert();
-        };
-
-      });
   });
 
 
